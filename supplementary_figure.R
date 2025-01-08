@@ -313,20 +313,26 @@ data.freq <- data.freq %>% mutate(date = as.Date(date.bin.num,origin=date.start)
 draw.df.theta <- fit.stan$draws("theta", format = "df") %>% as.data.frame() %>% select(! contains('.'))
 
 
-# column_chunks <- split(names(draw.df.theta), ceiling(seq_along(names(draw.df.theta)) / 5000))
+# chunk_size <- 1e6 
 # 
-# # Initialize an empty list to store intermediate results
-# long_format_list <- list()
+# row_indices <- split(seq_len(nrow(draw.df.theta.long)), ceiling(seq_len(nrow(draw.df.theta.long)) / chunk_size))
 # 
-# # Process each chunk separately
-# for (chunk in column_chunks) {
-#   long_format_list[[length(long_format_list) + 1]] <- draw.df.theta %>%
-#     select(all_of(chunk)) %>%
-#     pivot_longer(cols = everything(), names_to = "class", values_to = "value")
+# processed_chunks <- list()
+# 
+# for (i in seq_along(row_indices)) {
+#   chunk <- draw.df.theta.long[row_indices[[i]], ]
+#   
+#   processed_chunk <- chunk %>%
+#     mutate(
+#       data_Id = str_match(class, "theta\\[([0-9]+),[0-9]+\\]")[, 2] %>% as.numeric(),
+#       group_Id = str_match(class, "theta\\[[0-9]+,([0-9]+)\\]")[, 2] %>% as.numeric()
+#     )
+#   
+#   # Store the processed chunk
+#   processed_chunks[[i]] <- processed_chunk
 # }
 # 
-# # Combine the results into a single data frame
-# draw.df.theta.long <- bind_rows(long_format_list)
+# draw.df.theta.long <- bind_rows(processed_chunks)
 
 draw.df.theta.long <- draw.df.theta %>%
   pivot_longer(cols = everything(), names_to = "class", values_to = "value")
