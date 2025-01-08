@@ -1,11 +1,3 @@
-#!/bin/sh
-#$ -S /bin/bash
-#$ -pe def_slot 18 ##12
-#$ -l s_vmem=10G
-#$ -l lmem
-#$ -q '!mjobs_rerun.q'
-#$ #-o /dev/null
-
 nextclade="nextclade"
 
 ####Set and forget.
